@@ -37,7 +37,11 @@ fi
 target_list=( $(git branch -r --list "origin/$PREFIX*") )
 
 if [ "${#target_list[@]}" -eq "0" ]; then
-    echo "branches the name of which name starts with \"$PREFIX\" are not found"
+    echo "no branch was found with \"$PREFIX\""
+    exit 1
+fi
+if [ "${#target_list[@]}" -gt "10" ]; then
+    echo "too many branches were found with \"$PREFIX\", please confirm"
     exit 1
 fi
 
