@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+function show_usage() {
+  echo "--help: show this usage"
+  echo "-p --prefix: name prefix of target branches"
+  echo "-d --dry-run: show target branches with specified prefix, but won't delete actual"
+}
+
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -14,9 +20,9 @@ while [[ $# -gt 0 ]]; do
       DRY_RUN=YES
       shift # past argument
       ;;
-    --default)
-      DEFAULT=YES
-      shift # past argument
+    --help)
+      show_usage
+      exit 0
       ;;
     -*|--*)
       echo "Unknown option $1"

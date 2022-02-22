@@ -4,10 +4,13 @@ gh extension for delete branches on remote.
 
 ## usage
 
-show help with no arguments
 
 ```bash
-gh delete-remote-branch
+# delete remote branches the name of which start with specified prefix
+gh delete-remote-branch --prefix feature/some-feture/
+
+# show help more details
+gh delete-remote-branch --help
 ```
 
 ## installation
