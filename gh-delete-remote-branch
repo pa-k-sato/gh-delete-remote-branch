@@ -29,7 +29,18 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [ "$PREFIX" = "" ]; then
+  echo please specify branch name prefix
+  exit 1
+fi
+
 target_list=( $(git branch -r --list "origin/$PREFIX*") )
+
+if [ "${#target_list[@]}" -eq "0" ]; then
+    echo "branches the name of which name starts with \"$PREFIX\" are not found"
+    exit 1
+fi
+
 # show target branches
 for t in "${target_list[@]}"
 do
