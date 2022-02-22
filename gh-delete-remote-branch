@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Hello gh-delete-remote-branch!"
-
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -32,19 +30,27 @@ while [[ $# -gt 0 ]]; do
 done
 
 target_list=( $(git branch -r --list "origin/$PREFIX*") )
+# show target branches
+for t in "${target_list[@]}"
+do
+  echo "  delete branch: $t"
+done
 
 if [ "$DRY_RUN" = "YES" ]; then
-  echo dry run
-  for t in "${target_list[@]}"
-  do
-    echo "delete branch: $t"
-  done
+  echo finished dry run
   exit 0
+fi
+
+read -n1 -p "delete these branches from remote ? (Y/n): " yn
+echo
+if [[ ! $yn = [Y] ]]; then
+  echo deleting branches canceled
+  exit 1
 fi
 
 for t in "${target_list[@]}"
 do
   branch_name=$(echo $t | cut -c 8-)
-  echo git push origin --delete $branch_name
+  git push origin --delete $branch_name
 done
 
