@@ -3,33 +3,48 @@ set -e
 
 echo "Hello gh-delete-remote-branch!"
 
-# Snippets to help get started:
+POSITIONAL_ARGS=()
 
-# Determine if an executable is in the PATH
-# if ! type -p ruby >/dev/null; then
-#   echo "Ruby not found on the system" >&2
-#   exit 1
-# fi
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -p|--prefix)
+      PREFIX="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -d|--dry-run)
+      DRY_RUN=YES
+      shift # past argument
+      ;;
+    --default)
+      DEFAULT=YES
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
 
-# Pass arguments through to another command
-# gh issue list "$@" -R cli/cli
+target_list=( $(git branch -r --list "origin/$PREFIX*") )
 
-# Using the gh api command to retrieve and format information
-# QUERY='
-#   query($endCursor: String) {
-#     viewer {
-#       repositories(first: 100, after: $endCursor) {
-#         nodes {
-#           nameWithOwner
-#           stargazerCount
-#         }
-#       }
-#     }
-#   }
-# '
-# TEMPLATE='
-#   {{- range $repo := .data.viewer.repositories.nodes -}}
-#     {{- printf "name: %s - stargazers: %v\n" $repo.nameWithOwner $repo.stargazerCount -}}
-#   {{- end -}}
-# '
-# exec gh api graphql -f query="${QUERY}" --paginate --template="${TEMPLATE}"
+if [ "$DRY_RUN" = "YES" ]; then
+  echo dry run
+  for t in "${target_list[@]}"
+  do
+    echo "delete branch: $t"
+  done
+  exit 0
+fi
+
+for t in "${target_list[@]}"
+do
+  branch_name=$(echo $t | cut -c 8-)
+  echo git push origin --delete $branch_name
+done
+
